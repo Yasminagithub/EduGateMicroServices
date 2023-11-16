@@ -46,6 +46,8 @@ router.put('/modifier/:id', async (req, res) => {
 
     const existingDmModification = await DmModification.findOne({ inscription: idInscription });
     if (existingDmModification) {
+      //appel au service verifier validation from gestionnaire etudiant
+    //add service notification(sms au gestionnaire"faire inscription et effectif atteint", sms au etudiants"valider inscription)
       if (existingDmModification.accepted) {
         if(Date.now() - existingDmModification.actionDate < 604800000){
             await Inscription.updateOne({ idInscription }, { cne, filiere });
