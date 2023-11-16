@@ -1,0 +1,24 @@
+{
+  "name": "edugate",
+  "version": "1.0.0",
+  "description": "TP in Express.js Class",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "EduGate"
+  },
+  "author": "BABAHAJ Zakarya & CHARBIL Anouar & DADA Yasmina",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
