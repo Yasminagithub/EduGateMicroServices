@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const jwt = require('jsonwebtoken');
-const {Gestionnaire,Etudiant} = require('./db');
+const {Gestionnaire,Etudiant} = require('../db');
 
 
 const secretKey = 'KEY_TP_EXPRESS';
