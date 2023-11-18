@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3001;
 const sEtudiant = require("./SEtudiant.js");
-const {etudiantMiddleware}= require('./auth');
+const {etudiantMiddleware}= require('../SAuthentification/auth');
 
 
 

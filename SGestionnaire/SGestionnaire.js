@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const {DmModification}= require('./db');
+const {DmModification}= require('../db');
 
 router.post('/acceptModification/:id', async (req, res) => {
   const id = req.params.id;
