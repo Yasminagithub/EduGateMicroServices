@@ -1,5 +1,7 @@
 const router = require("express").Router();
-const {Filiere,DmModification,Inscription} = require('./db');
+//To communicate between two services
+const axios = require('axios');
+const {Filiere,DmModification,Inscription} = require('../db');
 
 router.post('/inscrir', async (req, res) => {
   const { idInscription, cne, filiere } = req.body;
@@ -40,28 +42,66 @@ router.post('/demodifier/:id', async (req, res) => {
   res.json(newDmModification);
 });
 
-router.put('/modifier/:id', async (req, res) => {
-    const { idInscription } = req.params;
-    const { cne, filiere } = req.body;
+// router.put('/modifier/:id', async (req, res) => {
+//     const { idInscription } = req.params;
+//     const { cne, filiere } = req.body;
 
-    const existingDmModification = await DmModification.findOne({ inscription: idInscription });
-    if (existingDmModification) {
-      //appel au service verifier validation from gestionnaire etudiant
-    //add service notification(sms au gestionnaire"faire inscription et effectif atteint", sms au etudiants"valider inscription)
-      if (existingDmModification.accepted) {
-        if(Date.now() - existingDmModification.actionDate < 604800000){
-            await Inscription.updateOne({ idInscription }, { cne, filiere });
-            res.json({ message: 'Inscription modifier' });
-        }else {
-            res.status(400).json({ message: 'Le délai de possibilite de modification est passé' });
+//     const existingDmModification = await DmModification.findOne({ inscription: idInscription });
+//     if (existingDmModification) {
+//       //appel au service verifier validation from gestionnaire etudiant
+//     //add service notification(sms au gestionnaire"faire inscription et effectif atteint", sms au etudiants"valider inscription)
+//       if (existingDmModification.accepted) {
+//         if(Date.now() - existingDmModification.actionDate < 604800000){
+//             await Inscription.updateOne({ idInscription }, { cne, filiere });
+//             res.json({ message: 'Inscription modifier' });
+//         }else {
+//             res.status(400).json({ message: 'Le délai de possibilite de modification est passé' });
+//         }
+//       } else{
+//         res.status(400).json({ message: 'Votre demande de modification n\'a pas été acceptée' });
+//       } 
+//     } else {
+//       res.status(400).json({ message: 'Vous devez d\'abord demander à modifier votre inscription' });
+//     }
+//   });
+
+
+router.put('/modifier/:idInscription', async (req, res) => {
+  const { idInscription } = req.params;
+  const { cne, filiere } = req.body;
+
+  try {
+    // Call the verification service from SVerification
+    const verificationResponse = await axios.get(`http://localhost:3003/sv/verify-modification/${idInscription}`);
+    const { accepted } = verificationResponse.data;
+
+    if (accepted) {
+      // Modification is accepted
+      // Proceed with the modification logic
+      const existingDmModification = await DmModification.findOne({ inscription: idInscription });
+
+      if (existingDmModification) {
+        if (Date.now() - existingDmModification.actionDate < 604800000) {
+          await Inscription.updateOne({ idInscription }, { cne, filiere });
+          res.json({ message: 'Inscription modifiée' });
+        } else {
+          res.status(400).json({ message: 'Le délai de possibilité de modification est passé' });
         }
-      } else{
-        res.status(400).json({ message: 'Votre demande de modification n\'a pas été acceptée' });
-      } 
+      } else {
+        res.status(400).json({ message: 'Vous devez d\'abord demander à modifier votre inscription' });
+      }
     } else {
-      res.status(400).json({ message: 'Vous devez d\'abord demander à modifier votre inscription' });
+      res.status(400).json({ message: 'Votre demande de modification n\'a pas été acceptée' });
     }
-  });
+  } catch (error) {
+    console.error('Error in modification:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+module.exports = router;
+
+
 
 router.get('/inscription/:id', async (req, res) => {
   const { id } = req.params;
