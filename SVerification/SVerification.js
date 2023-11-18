@@ -1,7 +1,5 @@
 const router = require("express").Router();
-const {DmModification}= require('../db');
-
-
+const { DmModification } = require('../db');
 
 router.get('/verify-modification/:idInscription', async (req, res) => {
   const { idInscription } = req.params;

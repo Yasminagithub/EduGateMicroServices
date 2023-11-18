@@ -65,14 +65,14 @@ router.post('/demodifier/:id', async (req, res) => {
 //     }
 //   });
 
-//Version with the apply for Service Verification
-router.put('/modifier/:id', async (req, res) => {
+
+router.put('/modifier/:idInscription', async (req, res) => {
   const { idInscription } = req.params;
   const { cne, filiere } = req.body;
 
   try {
     // Call the verification service from SVerification
-    const verificationResponse = await axios.get(`http://localhost:3003/verification/verify-modification/${idInscription}`);
+    const verificationResponse = await axios.get(`http://localhost:3003/sv/verify-modification/${idInscription}`);
     const { accepted } = verificationResponse.data;
 
     if (accepted) {
@@ -98,6 +98,9 @@ router.put('/modifier/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+module.exports = router;
+
 
 
 router.get('/inscription/:id', async (req, res) => {
